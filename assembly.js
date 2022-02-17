@@ -111,5 +111,5 @@ app.post("/", async (req, res) => {
   );
 });
 
-console.log("Listening on Port " + process.env.PORT?process.env.PORT:"3000");
+console.log(`Listening on Port ${process.env.PORT}`);
 server.listen(process.env.PORT || 3000);

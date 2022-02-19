@@ -13,6 +13,7 @@ let assembly = new WebSocket(
   );
 
 let chunks = [];
+const PORT = process.env.PORT || 3000;
 
 wss.on("connection", (ws) => {
   console.info("New Connection Initiated");
@@ -111,5 +112,5 @@ app.post("/", async (req, res) => {
   );
 });
 
-console.log("Listening on Port 3000");
-server.listen(3000);
+console.log("Listening on Port " + PORT);
+server.listen(PORT);

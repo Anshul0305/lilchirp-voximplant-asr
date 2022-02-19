@@ -19,6 +19,8 @@ wss.on("connection", (ws) => {
   console.info("New Connection Initiated");
 
   ws.on("message", (message) => {
+    console.log("received:", message);
+    
     if (!assembly)
       return console.error("AssemblyAI's WebSocket must be initialized.");
 

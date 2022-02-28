@@ -7,20 +7,24 @@ const app = express();
 const server = require("http").createServer(app);
 const wss = new WebSocket.Server({ server });
 
-let assembly = new WebSocket(
-    "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000",
-    { headers: { authorization: '0a74bbbe22744194815c4520ad4aaa6d' } }
-  );
-
+let assembly;
 let chunks = [];
 const PORT = process.env.PORT || 3000;
 
 wss.on("connection", (ws) => {
-  console.info("New Connection Initiated");
+  console.info("New Connection Initiated", ws);
+
+  assembly = new WebSocket(
+    "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000",
+    { headers: { authorization: '0a74bbbe22744194815c4520ad4aaa6d' } }
+  );
+
+  ws.on("close", () => {
+    console.log("Connection Closed")
+    assembly.send(JSON.stringify({ terminate_session: true }));
+  });
 
   ws.on("message", (message) => {
-    console.log("received:", message);
-    
     if (!assembly)
       return console.error("AssemblyAI's WebSocket must be initialized.");
 
@@ -28,11 +32,11 @@ wss.on("connection", (ws) => {
 
     assembly.onmessage = (assemblyMsg) => {
       const res = JSON.parse(assemblyMsg.data);
-      // console.log(`${res.text} ( confidence: ${res.confidence}) message type: ${res.message_type}`);
-      if(res.message_type === "FinalTranscript") {
+      console.log(`${res.text} ( confidence: ${res.confidence}) message type: ${res.message_type}`);
+      // if(res.message_type === "FinalTranscript") {
         console.log("sending..", res.text, "at", new Date().toISOString());
         ws.send(res.text);
-      }
+      // }
     };
 
     switch (msg.event) {
@@ -85,8 +89,7 @@ wss.on("connection", (ws) => {
         break;
 
       case "stop":
-        console.info("Call has ended");
-        assembly.send(JSON.stringify({ terminate_session: true }));
+        console.info("Audio stream has ended");
         break;
     }
   });

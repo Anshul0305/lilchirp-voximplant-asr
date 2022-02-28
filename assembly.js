@@ -15,13 +15,14 @@ let assembly = new WebSocket(
 let chunks = [];
 const PORT = process.env.PORT || 3000;
 
+wss.on("close", () => {
+  console.log("Connection Closed")
+  assembly.send(JSON.stringify({ terminate_session: true }));
+});
+
+
 wss.on("connection", (ws) => {
   console.info("New Connection Initiated");
-
-  ws.on("close", () => {
-    console.log("Connection Closed")
-    assembly.send(JSON.stringify({ terminate_session: true }));
-  });
 
   ws.on("message", (message) => {
     if (!assembly)
@@ -31,9 +32,9 @@ wss.on("connection", (ws) => {
 
     assembly.onmessage = (assemblyMsg) => {
       const res = JSON.parse(assemblyMsg.data);
-      console.log(`${res.text} ( confidence: ${res.confidence}) message type: ${res.message_type}`);
+      // console.log(`${res.text} ( confidence: ${res.confidence}) message type: ${res.message_type}`);
       // if(res.message_type === "FinalTranscript") {
-        console.log("sending..", res.text, "at", new Date().toISOString());
+        console.log(`sending ${res.message_type} `, res.text, "at", new Date().toISOString());
         ws.send(res.text);
       // }
     };

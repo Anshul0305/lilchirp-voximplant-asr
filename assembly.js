@@ -7,17 +7,16 @@ const app = express();
 const server = require("http").createServer(app);
 const wss = new WebSocket.Server({ server });
 
-let assembly;
+let assembly = new WebSocket(
+  "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000",
+  { headers: { authorization: '0a74bbbe22744194815c4520ad4aaa6d' } }
+);
+
 let chunks = [];
 const PORT = process.env.PORT || 3000;
 
 wss.on("connection", (ws) => {
-  console.info("New Connection Initiated", ws);
-
-  assembly = new WebSocket(
-    "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000",
-    { headers: { authorization: '0a74bbbe22744194815c4520ad4aaa6d' } }
-  );
+  console.info("New Connection Initiated");
 
   ws.on("close", () => {
     console.log("Connection Closed")

@@ -14,7 +14,7 @@ wss.on("connection", (ws) => {
 
   let assembly = new WebSocket(
     "wss://api.deepgram.com/v1/listen",
-    { headers: { token: '8ee4f81999ffcb7f3b47ea8a2eadf8f6cafda483' } }
+    { headers: { token: '8117c12196807ef8794ceba9e2fe66b2265ec9ae' } }
   );
 
   ws.on("message", (message) => {

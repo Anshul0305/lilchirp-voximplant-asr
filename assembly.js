@@ -6,6 +6,7 @@ const WaveFile = require("wavefile").WaveFile;
 const app = express();
 const server = require("http").createServer(app);
 const wss = new WebSocket.Server({ server });
+let counter = 0;
 
 let assembly = new WebSocket(
   "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000",
@@ -34,7 +35,7 @@ wss.on("connection", (ws) => {
       const res = JSON.parse(assemblyMsg.data);
       // console.log(`${res.text} ( confidence: ${res.confidence}) message type: ${res.message_type}`);
       // if(res.message_type === "FinalTranscript") {
-        console.log(`sending ${res.message_type} `, res.text, "at", new Date().toISOString());
+        console.log(`received response from assembly: ${res.message_type} `, res.text, "at", new Date().toISOString());
         ws.send(res.text);
       // }
     };
@@ -82,6 +83,10 @@ wss.on("connection", (ws) => {
           const encodedAudio = audioBuffer.toString("base64");
 
           // Finally send to assembly and clear chunks
+          if(counter == 0){
+            console.log("sending audio to assembly at ", new Date().toISOString());
+            counter++;
+          }
           assembly.send(JSON.stringify({ audio_data: encodedAudio }));
           chunks = [];
         }

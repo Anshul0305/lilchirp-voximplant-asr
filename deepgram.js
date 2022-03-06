@@ -8,14 +8,13 @@ const server = require("http").createServer(app);
 const wss = new WebSocket.Server({ server });
 
 let chunks = [];
+let assembly = new WebSocket(
+  "wss://api.deepgram.com/v1/listen",
+  { headers: { token: '8117c12196807ef8794ceba9e2fe66b2265ec9ae' } }
+);
 
 wss.on("connection", (ws) => {
   console.info("New Connection Initiated");
-
-  let assembly = new WebSocket(
-    "wss://api.deepgram.com/v1/listen",
-    { headers: { token: '8117c12196807ef8794ceba9e2fe66b2265ec9ae' } }
-  );
 
   ws.on("message", (message) => {
     if (!assembly)
@@ -26,10 +25,10 @@ wss.on("connection", (ws) => {
     assembly.onmessage = (assemblyMsg) => {
       const res = JSON.parse(assemblyMsg.data);
       // console.log(`${res.text} ( confidence: ${res.confidence}) message type: ${res.message_type}`);
-      if(res.message_type === "FinalTranscript") {
-        console.log("sending..", res.text, "at", new Date().toISOString());
-        ws.send(res.text);
-      }
+     
+        console.log("sending..", res, "at", new Date().toISOString());
+        // ws.send(res.text);
+
     };
 
     switch (msg.event) {
